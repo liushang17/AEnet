@@ -1,0 +1,2 @@
+# AEN
+This study constructs two new methods to study alternative splicing events at the single-cell level, namely DESJ-detection and AEN. DESJ-detection can detect alternative splicing differences at the single-cell level. AEN can not only systematically analyze the relationship between alternative splicing events and cell states, but also detect alternative splicing events in the process of cell state changes. At the same time, AEN also optimized the ability of DESJ-detection to detect differential alternative splicing.
