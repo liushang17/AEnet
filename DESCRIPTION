@@ -1,0 +1,19 @@
+Package: AEN
+Title: Alternative Splicing Pattern and Expression Network (AEN)
+Version: 1.0
+Authors@R: 
+    person("Shang", "Liu", , "liushang@genomics.cn", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-8050-7968"))
+Description: Recently, rapid developed single-cell transcriptomics technology has greatly advanced the process of deeply analyzing cellular heterogeneity from gene expression level. However, due to technical limitations such as sequencing depth, dropout events, and batch effects, we have not yet found an ideal approach to comprehensively analyze cellular heterogeneity and its regulatory mechanisms at alternative splicing level. Therefore, this study aims to construct a novel method named alternative splicing network(AEN) combining gene expression levels with AS patterns to analyze cellular heterogeneity, identify novel cell types, and infer the regulatory mechanisms of alternative splicing.
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+        license
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1
+Depends: Rfast, dplyr, pheatmap, reshape2, tidyr, data.table, Matrix,
+        umap, ggsci, ggplot2, ggrepel, ggpubr, Seurat, msigdbr,
+        openxlsx
+NeedsCompilation: no
+Packaged: 2024-07-30 13:01:33 UTC; shangliu
+Author: Shang Liu [aut, cre] (<https://orcid.org/0000-0001-8050-7968>)
+Maintainer: Shang Liu <liushang@genomics.cn>
