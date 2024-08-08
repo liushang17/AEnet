@@ -4,4 +4,4 @@ Alternative splicing (AS), as a crutical promoter of proteomic diversity, consti
 devtools::install_github("https://github.com/liushang17/AEN")
 
 # Demo
-We showed the application of a demo in the demo.r. The dataset used in the demo.r is shown in the link ().
+We showed the application of a demo in the demo.r. The dataset used in the demo.r is shown in the link (https://pan.baidu.com/s/14ZMS2e6fMk3P1CLdOCK6tw . Extraction code ：fyS9).
