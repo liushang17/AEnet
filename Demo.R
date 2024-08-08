@@ -4,7 +4,7 @@ setwd("/Users/shangliu/01.terms/02.AEN/02.result/11.method/AEN/AEN/tests/")
 ############# input ###############
 mat <- readRDS("Normalize.step3.rds")  ## The cell-junction CPM matrix, which is from the DESJ-detection pipeline
 exp <- readRDS("Neu.exp.newname.rds") ## The cell-gene expression matrix
-ann <- read.table("Neu.cluster.xls",sep = "\t") ## The cell meta information
+ann <- read.table("Neu.cluster.csv",sep = ",") ## The cell meta information
 sf <- read.table("splicing.factor.v2.txt",sep = "\t") ## The splicing factor list
 
 ############ Transformation ########
