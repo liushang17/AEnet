@@ -2,10 +2,10 @@ library(AEN)
 
 setwd("/Users/shangliu/01.terms/02.AEN/02.result/11.method/AEN/AEN/tests/")
 ############# input ###############
-mat <- readRDS("/Users/shangliu/01.terms/02.AEN/02.result/11.method/AEN/AEN/tests/Normalize.step3.rds")
-exp <- readRDS("/Users/shangliu/01.terms/02.AEN/02.result/11.method/AEN/AEN/tests/Neu.exp.newname.rds")
-ann <- read.table("/Users/shangliu/01.terms/02.AEN/02.result/11.method/AEN/AEN/tests/Neu.cluster.xls",sep = "\t")
-sf <- read.table("/Users/shangliu/01.terms/02.AEN/00.basic/splicing.factor.v2.txt",sep = "\t")
+mat <- readRDS("Normalize.step3.rds")  ## The cell-junction CPM matrix, which is from the DESJ-detection pipeline
+exp <- readRDS("Neu.exp.newname.rds") ## The cell-gene expression matrix
+ann <- read.table("Neu.cluster.xls",sep = "\t") ## The cell meta information
+sf <- read.table("splicing.factor.v2.txt",sep = "\t") ## The splicing factor list
 
 ############ Transformation ########
 colnames(ann) <- c("cell","Type")
