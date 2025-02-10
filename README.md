@@ -13,8 +13,7 @@ Step1: ASP Determination. Exon-exon junctions with the same starting point or en
 
 Outputs: The output of ASP determination is one metadata, including ASPs and the junction composition of ASPs. 
 
-Below is an example command:
-asp <- asp(annj)  # annj is a dataframe with the first column as junctions.
+Below is an example command: asp <- asp(annj)  # annj is a dataframe with the first column as junctions.
 
 
 ## install
