@@ -5,6 +5,14 @@ Alternative splicing (AS), as a crutical promoter of proteomic diversity, consti
 AENet consists of six steps: ASP Determination, ASP-Expression Network Construction, Multiple-Sample Integration, Key ASP Identification, ASP Cluster Determination, Cell Type Identification Assistance, and Regulatory Mechanism Prediction. Detailed information for each step is provided below.
 
 ### ASP Determination
+The goal of the ASP Determination step is to identify alternative splicing patterns within the dataset.
+
+Inputs: The input required for this step: A series of junctions in the dataset from DESJ-detection (https://github.com/liushang17/DESJ-detection). 
+Step1: ASP Determination. Exon-exon junctions with the same starting point or endpoint were defined as alternative splicing patterns (ASP). 
+Outputs: The output of ASP determination is one metadata, including ASPs and the junction composition of ASPs. 
+
+Below is an example command:
+asp <- asp(annj)  # annj is a dataframe with the first column as junctions.
 
 
 ## install
