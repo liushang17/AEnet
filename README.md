@@ -119,6 +119,7 @@ Step3: The identification of the different pathways affected by ASPs. For a sing
 Output: The ranking and associated splicing factors with the specific ASP cluster.
 
 Below is an example command:
+
 key_sf_C1 <- key_sf(corm2,sfname,ann_junc,"C_1") # To detect the key splicing factors for each ASP classes
 
 
