@@ -20,13 +20,13 @@ asp <- asp(annj)  # annj is a dataframe with the first column as junctions.
 ### ASP-Expression Network
 At the ASP-Expression Network step, AEN would detect the relationship between ASP usage preference and gene expression dynamic and construct ASP-Expression Network for each sample. 
 
-Inputs. The Gene expression matrix with cell as column, gene as row, and expression as value, as well as the cell metadata with the cell resource information. The Cell-junction CPM matrix and the ASPs metadata from the above step are also needed. 
+Inputs: The Gene expression matrix with cell as column, gene as row, and expression as value, as well as the cell metadata with the cell resource information. The Cell-junction CPM matrix and the ASPs metadata from the above step are also needed. 
 
 Step1: detect the relationship between ASPs usage preference and gene expression dynamic. Spearman correlation was calculated between the PSI values of ASPs and gene expression when the number of cells expressing non-missing values of PSI exceeded 10.
 
 Step2: integrate the relationship across all genes and ASPs. All ASPs and genes were represented as nodes in the AEN graph (Alternative Splicing Pattern-Expression Network). ASPs were connected to their significantly associated genes (P value < 0.01), with the line width indicating the strength and direction (positive or negative) of the correlation.
 
-Output. The output of ASP-Expression Network is the AEN network in a file with the four columns: ASP, Gene symbol, correlation coefficient, and p value.
+Output: The output of ASP-Expression Network is the AEN network in a file with the four columns: ASP, Gene symbol, correlation coefficient, and p value.
 
 Below is an example command:
 
@@ -37,11 +37,11 @@ cor_list <- mutli(exp,mat,asp,ann) # Construct the AEN network for each sample
 ### Multiple-Samples Integration
 At the multiple samples integration, we would integrate the AEN network from all samples to form the final pan-samples AEN network. 
 
-Inputs. Multiple inputs are required for this step: the AEN network from all samples.
+Inputs: Multiple inputs are required for this step: the AEN network from all samples.
 
 Step1: filter the ASP-Gene pairs in the given batch. AEN filters out ASP-gene pairs that are present in only one sample and excludes those with opposing correlations across different samples. For the remaining pairs, the strength is determined by the number of samples in which the ASP-gene pair is present. The direction of A-E links aligns with the direction observed in single samples.
 
-Output. The output of the steps is the high quality ASP-Gene pairs, with three columns: ASP, Gene Symbol, number of samples, and direction.
+Output: The output of the steps is the high quality ASP-Gene pairs, with three columns: ASP, Gene Symbol, number of samples, and direction.
 
 Below is an example command:
 corm <- merge_cor(cor_list) # Merge the AEN network across multiple samples
@@ -49,13 +49,13 @@ corm <- merge_cor(cor_list) # Merge the AEN network across multiple samples
 ### The determination of anchor ASP
 At the anchor ASP determination, AEN would identify the anchor ASP events based on the degree of ASPs in the network in the high quality AEN network.
 
-Inputs. The high quality AEN network from the above steps.
+Inputs: The high quality AEN network from the above steps.
 
 Step1: The identification of the key ASP. The degree of ASP nodes in the AEN network is determined by the number of links associated with the ASP. The top 1,500 ASPs with the highest degree were identified as anchor ASPs.
 
 Step2: the final AEN network. The anchor ASPs and their associated links were retained to construct a high-quality AEN network.
 
-Output. The output of the steps is the final ASP-Gene pairs, with three columns: the anchor ASP, Gene Symbol, number of samples, and direction.
+Output: The output of the steps is the final ASP-Gene pairs, with three columns: the anchor ASP, Gene Symbol, number of samples, and direction.
 
 Below is an example command:
 
@@ -64,7 +64,7 @@ corm2 <- asp_selection(corm) # To construct the high quality AEN
 ### ASP cluster Determination
 The next step aims to identify ASP clusters. The ASPs within each cluster are associated with similar phenotypes, corresponding to a specific gene set. 
 
-Inputs. The AEN network of the anchor ASPs from the above steps.
+Inputs: The AEN network of the anchor ASPs from the above steps.
 
 Step1: The transformation of AEN. To begin, the graph is transformed into a matrix where gene features are represented as rows, ASPs as columns, and the correlation direction (with 1 indicating a positive correlation and -1 indicating a negative correlation) as the matrix elements.
 
@@ -76,7 +76,7 @@ Step4: ASP sub-clusters filtering. Sub-clusters are retained when more than 10% 
 
 Step5: ASP sub-clusters merging. Clusters with fewer than 10 ASPs are merged with the most similar clusters, provided that the similarity between clusters is above 0.1. The similarity between two ASP clusters is defined as the proportion of ASP pairs with a similarity score greater than 0.1, where one ASP in the pair belongs to one cluster and the other ASP belongs to the other cluster.
 
-Output. The ASP clusters as well as the Jaccard similarity coefficient matrix.
+Output: The ASP clusters as well as the Jaccard similarity coefficient matrix.
 
 Below is an example command:
 
@@ -89,7 +89,7 @@ asp_simm <- ann_junc_list$asp_simm
 ### Assistance of cell type identification
 The aim is to uncover cellular splicing heterogeneity based on the ASP clusters. 
 
-Inputs. The ASP clusters and the Cell-junction CPM (counts per million) matrix.
+Inputs: The ASP clusters and the Cell-junction CPM (counts per million) matrix.
 
 Step1: The enrichment score of the ASP clusters for each cell. AEN constructs an enrichment score matrix, using the enrichment score as an indicator of the extent to which a cell is influenced by the ASP clusters. The enrichment score is calculated by determining the mean PSI of ASPs within the ASP clusters across the cells.
 
@@ -97,7 +97,7 @@ Step2: the cell heterogeneity. AEN will apply clustering on the Cell-ASP classes
 
 Step3: Visualization. The enrichment score matrix is used as input for UMAP (Uniform Manifold Approximation and Projection) using the UMAP package.
 
-Output. The output is the cell annotation determined by alternative splicing.
+Output: The output is the cell annotation determined by alternative splicing.
 
 Below is an example command:
 
@@ -108,7 +108,7 @@ cell_info <- cell_clus(asp_mat,resolution = 1,min.dist = 0.1) # To clustering ba
 ### Regulatory mechanism prediction
 The aim is to elucidate potential regulatory mechanisms between alternative splicing and gene expression. A total of 404 splicing factors was downloaded from the SpliceAidF database (http://srv00.recas.ba.infn.it/SpliceAidF/). 
 
-Inputs The ASP clusters, as well as the AEN network.
+Input: The ASP clusters, as well as the AEN network.
 
 Step1: The extraction of SFs sub-AEN. AEN extracted the splicing factors as well as the associated ASPs in the AEN to form the SFs sub-AEN.
 
@@ -116,7 +116,7 @@ Step2: The key splicing factors. For a given ASP cluster, we further extracted t
 
 Step3: The identification of the different pathways affected by ASPs. For a single ASP event, we identified gene sets positively and negatively correlated with the event. Functional enrichment analysis was performed on the ASP gene and the positively and negatively correlated gene sets. The pathways to which the ASP gene belongs is affected by the ASP events. Metascape was used for the pathway analysis.
 
-Output. The ranking and associated splicing factors with the specific ASP cluster.
+Output: The ranking and associated splicing factors with the specific ASP cluster.
 
 Below is an example command:
 key_sf_C1 <- key_sf(corm2,sfname,ann_junc,"C_1") # To detect the key splicing factors for each ASP classes
