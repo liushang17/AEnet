@@ -128,4 +128,4 @@ key_sf_C1 <- key_sf(corm2,sfname,ann_junc,"C_1") # To detect the key splicing fa
 devtools::install_github("https://github.com/liushang17/AEN")
 
 ## Demo
-We showed the application of a demo in the demo.r. The dataset used in the demo.r is shown in the link (https://pan.baidu.com/s/14ZMS2e6fMk3P1CLdOCK6tw . Extraction code ：fyS9).
+We demonstrated the application of a demo in demo.r. The dataset used in demo.r is available at Zenodo (https://zenodo.org/records/14842870). This demo dataset comprises three distinct cell types involved in neuronal differentiation (Neuron dataset), as reported by Song et al. (DOI: 10.1016/j.molcel.2017.06.003). The cell types include induced pluripotent stem cells (iPSCs), in vitro differentiated neural progenitor cells (NPCs), and motor neurons (MNs).
