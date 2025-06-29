@@ -6,5 +6,5 @@ AEnet comprises six analytical steps: (1) Alternative Splicing Pattern (ASP) Det
 Two demonstration datasets are provided—T cell and iPSC datasets—with corresponding example scripts named demo.Tcells.R and demo.iPSC.R. The demo datasets can be downloaded from the following links: (provide links here).
 
 ## install
-devtools::install_github("https://github.com/liushang17/AEN")
+devtools::install_github("https://github.com/liushang17/AEnet")
 
