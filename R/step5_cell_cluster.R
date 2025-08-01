@@ -157,20 +157,23 @@ cell_clus <- function(asp_score = NULL, exp_score = NULL, resolution = 0.5,
   } else {
     mat <- if (!is.null(asp_score)) asp_mat else exp_mat
   }
+
+  # NA
+  na.omit(mat)
   
   # Clustering
-  #snn <- Seurat::FindNeighbors(mat)$snn
-  #clusters <- Seurat::FindClusters(snn, resolution = resolution)
-  #umap <- Seurat::RunUMAP(mat, min.dist = min.dist)
-  return(mat)
+  snn <- Seurat::FindNeighbors(mat)$snn
+  clusters <- Seurat::FindClusters(snn, resolution = resolution)
+  umap <- Seurat::RunUMAP(mat, min.dist = min.dist)
+ 
   # Return results
-  #data.frame(
-  #  Cell = rownames(mat),
-  #  cluster = clusters[, 1],
-  #  umap_1 = umap@cell.embeddings[, 1],
-  #  umap_2 = umap@cell.embeddings[, 2],
-  #  row.names = NULL
-  #)
+  data.frame(
+    Cell = rownames(mat),
+    cluster = clusters[, 1],
+    umap_1 = umap@cell.embeddings[, 1],
+    umap_2 = umap@cell.embeddings[, 2],
+    row.names = NULL
+  )
 }
 
 #' @title Identify Key Splicing Factors
