@@ -28,6 +28,7 @@ asp <- function(junc_mat, outdir, min_freq = 2, n_cores = 2) {
   setDT(desj)
   setnames(desj, 1, "V1")
   annj <- unique(desj)
+  annj$V1 <- annj$V1
 
   # Parse junction information
   # Format: "chr_start_end_site"
