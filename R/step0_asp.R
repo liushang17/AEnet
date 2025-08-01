@@ -50,12 +50,12 @@ asp <- function(junc_mat, outdir, min_freq = 2, n_cores = 2) {
     clusterEvalQ(cl, library(data.table))
 
     # Generate all possible junction pairs for each qualifying site
-    pairs_list <- parLapply(cl, sui[[col]], function(x) {
-      junctions <- annj[get(col) == x, ]$V1
-      if (length(junctions) >= 2) {
-        combn(junctions, 2, simplify = FALSE)
-      } else NULL
-    })
+    pairs_list <- foreach(x = sui[[col]], .packages = "data.table") %dopar% {
+        junctions <- annj[get(col) == x, V1]
+        if (length(junctions) >= 2) {
+            combn(junctions, 2, simplify = FALSE)
+        } else NULL
+    }
 
     stopCluster(cl)
 
