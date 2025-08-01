@@ -22,7 +22,7 @@ asp_score <- function(psi_matrix, ann_junc) {
   ann_junc <- subset(ann_junc, PC != "Other")
   
   # Get unique clusters
-  clusters <- unique(ann_junc$PC)
+  clusters <- unique(as.character(ann_junc$PC))
   all_scores <- list()
   
   for (clus in clusters) {
