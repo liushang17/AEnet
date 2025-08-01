@@ -159,7 +159,7 @@ cell_clus <- function(asp_score = NULL, exp_score = NULL, resolution = 0.5,
   }
 
   # NA
-  na.omit(mat)
+  mat <- na.omit(mat)
   
   # Clustering
   snn <- Seurat::FindNeighbors(mat)$snn
