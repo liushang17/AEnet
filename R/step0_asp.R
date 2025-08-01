@@ -51,7 +51,7 @@ asp <- function(junc_mat, outdir, min_freq = 2, n_cores = 2) {
 
     # Generate all possible junction pairs for each qualifying site
     pairs_list <- parLapply(cl, sui[[col]], function(x) {
-      junctions <- annj[get(col) == x,]$V1
+      junctions <- annj[annj[[col]] == x,]$V1
       if (length(junctions) >= 2) {
         combn(junctions, 2, simplify = FALSE)
       } else NULL
