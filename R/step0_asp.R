@@ -22,36 +22,33 @@
 #'                                  paste0("sample", 1:25)))
 #' asp_results <- asp(junc_mat)
 
-library(data.table)
-library(parallel)
-
 asp <- function(junc_mat, outdir, min_freq = 2, n_cores = 2) {
   # Convert input to data.table format
   desj <- data.frame(V1 = rownames(junc_mat), type = "junction")
   setDT(desj)
   setnames(desj, 1, "V1")
   annj <- unique(desj)
-  
+
   # Parse junction information
   # Format: "chr_start_end_site"
   annj[, c("chr", "st", "en", "site") := tstrsplit(V1, "_", fixed = TRUE)]
-  
+
   # Create composite keys for start/end positions
   annj[, chr_st := paste(chr, st, site, sep = "_")]  # chr_start_site
   annj[, chr_en := paste(chr, en, site, sep = "_")]  # chr_end_site
-  
+
   # Function to find junction pairs sharing common features
   get_pairs_parallel <- function(col) {
     # Filter for sites meeting frequency threshold
     sui <- annj[, .N, by = col][N >= min_freq]
-    
+
     if (nrow(sui) == 0) return(NULL)
-    
+
     # Parallel processing setup
     cl <- makeCluster(n_cores)
     clusterExport(cl, c("annj", "col"), envir = environment())
     clusterEvalQ(cl, library(data.table))
-    
+
     # Generate all possible junction pairs for each qualifying site
     pairs_list <- parLapply(cl, sui[[col]], function(x) {
       junctions <- annj[get(col) == x, V1]
@@ -59,9 +56,9 @@ asp <- function(junc_mat, outdir, min_freq = 2, n_cores = 2) {
         combn(junctions, 2, simplify = FALSE)
       } else NULL
     })
-    
+
     stopCluster(cl)
-    
+
     # Format results
     pairs <- unlist(pairs_list, recursive = FALSE)
     if (length(pairs) > 0) {
@@ -72,7 +69,7 @@ asp <- function(junc_mat, outdir, min_freq = 2, n_cores = 2) {
       )
     } else NULL
   }
-  
+
   # Find pairs sharing either start or end positions
   mit <- rbindlist(list(
     get_pairs_parallel("chr_st"),  # Pairs with common starts
