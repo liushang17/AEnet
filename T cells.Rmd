@@ -1,0 +1,260 @@
+---
+title: "T cells datasets"
+author: "Shang Liu"
+output: html_document
+date: "2025-08-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Preparation
+  The AEnet package can be installed using the following command: devtools::install_github("liushang17/AEnet")             
+  This tutorial demonstrates the application of AEnet for single-cell alternative splicing (AS) clustering and regulatory mechanism prediction using full-length single-cell RNA-sequencing methods, such as Smart-seq2. The dataset used to illustrate the utility of AEnet comprises T cells with different status, such as naive, effector, memory, exhaustion, and Treg (Zhang et al., 2018).
+
+  This demonstration is based on the T cells dataset, which can be downloaded from the following link:
+[https://drive.google.com/file/d/1zuut5OlYgFeYXytU5kUZsYKbx07CKb56/view?usp=drive_link]
+
+## Load Package
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library(Seurat)
+library(AEN)
+library(ggsci)
+library(ggrepel)
+library(ggpubr)
+col <- c(pal_npg("nrc")(10)[1:6],"#FAFD7CFF","#FF6F00FF",pal_lancet("lanonc")(9)[c(1,3,7)],"#660099FF","#B5CF6BFF","#B24745FF","#CCFF00FF",
+         "#FFCD00FF","#800000FF","#20854EFF","#616530FF","#FF410DFF","#EE4C97FF","#FF1463FF","#00FF00FF","#990080FF","#00FFFFFF",
+         "#666666FF","#CC33FFFF","#00D68FFF","#4775FFFF","#C5B0D5FF","#FDAE6BFF","#79CC3DFF","#996600FF","#FFCCCCFF","#0000CCFF",
+         "#7A65A5FF","#1A5354FF","#24325FFF")
+```
+
+## Input 
+  We will load the required input files for AEnet and describe the formatting requirements for each file.
+### Sample Metadata
+  This is a user-generated tab-delimited file in which each row corresponds to a cell ID, and each column represents associated cell metadata, such as cell type or patient identifier. The only required column is 'cell','Type',and 'Patient'; all other columns are optional.
+```{r cars}
+indir <- "/Users/shangliu/01.terms/02.AEN/04.result/CRC/input/"
+outdir <- "/Users/shangliu/01.terms/02.AEN/04.result/CRC/result/"
+ann <- read.table(paste0(indir,"/metadata.xls"),sep = "\t",header = T) # The cell metadata
+
+ann <- ann[,c("allcell","cluster","Patient_ID")]
+colnames(ann) <- c("cell","Type","Patient")
+head(ann)
+```
+### Splice junction counts matrix
+  The rows of this matrix represent splice junction coordinates, the columns correspond to cell IDs, and the values denote splice junction counts. This junction count matrix can be generated using the DESJ-detection (Liu et al., 2021) tool (https://github.com/liushang17/DESJ-detection), with the *SJ.out.tab files from STAR (v2.5.3, Dobin et al., 2013) as input.
+  Due to the large size of the T cell dataset, we present only a subset of junctions from the Cell-Junction Count Matrix.
+```{r}
+mat <- readRDS(paste0(indir,"/ASP.subset.rds")) # Cell-junction Count Matrix. The input should be ASP.rds
+mat[1:5,1:5]
+```
+
+### Splicing event metadata
+      The rows of this metadata file represent splice junction coordinates, while the columns include cell IDs, gene IDs (second column), and gene symbols (third column). The metadata can be generated using the DESJ-detection tool (Liu et al., 2021) available at https://github.com/liushang17/DESJ-detection.
+```{r}
+aspann <- read.table(paste0(indir,"/junction_anno.xls"),sep = "\t") # The junction 
+head(ann)
+```
+
+### Gene expression matrix
+  The rows of this matrix represent gene symbol, the columns correspond to cell IDs, and the values indicate normalized gene expression levels.
+  Due to the large size of the T cell dataset, we present only a subset of genes from the Cell-gene Expression Matrix.
+```{r}
+exp <- readRDS(paste0(indir,"/exp.subset.rds")) # Cell-Gene Expression Matrix.  The input should be exp.rds
+exp[1:5,1:5]
+```
+
+### Splicing Factor list
+A predefined list of splicing factors curated from Seiler et al. (2018).
+```{r}
+sf <- read.table(paste0(indir,"/splicing.factor.v2.txt"),sep = "\t") # The SF list
+head(sf)
+```
+
+## ASP detection
+Exon–exon junctions sharing the same start or end coordinates were defined as alternative splicing patterns (ASPs), which can be identified using AEnet. Existing tools such as BRIE, Outrigger, and MARVEL rely heavily on transcriptome annotations, limiting their ability to detect unannotated alternative splicing (AS) events. Moreover, these methods exhibit limited sensitivity in identifying mutually exclusive exons (MSE). In contrast, AEnet enables the detection of a wide spectrum of splicing events—including exon skipping (ES), mutually exclusive exons (MXE), alternative 5′ splice sites (A5SS), alternative 3′ splice sites (A3SS), alternative last exons (ALE), alternative first exons (AFE), MSE, and other unannotated AS events.
+The output consists of three columns: the ASP event, the first junction of the ASP event, and the corresponding alternative junction.
+
+![](/Users/shangliu/02.report/02.AEN/Figure/1754035709386.jpg)
+```{r}
+annj <- asp(mat, outdir,n_cores=2) ##### ASP detection
+head(annj)
+```
+
+### PSI calculation
+The percent spliced-in (PSI) for a specific AS event is defined as the proportion of junction reads curated from all detected junctions that span the same site. Notably, unlike expression values, which are always nonnegative integers, PSI is assigned as NaN (resulting from division by 0) when no junction reads are detected at a presupposed AS site in a cell. 
+![](/Users/shangliu/02.report/02.AEN/Figure/ASP.jpg)
+
+```{r echo=TRUE, eval=FALSE}
+psi_matrix <- calculate_psi(mat,annj,outdir) ##### PSI calculation
+```
+
+```{r}
+psi_matrix <- readRDS(paste0(outdir,"/step1.psi.rds"))
+psi_matrix[1:5,1:5]
+```
+
+### ASP-EXP Network
+To mitigate this effect, for each ASP and each gene, we limit the calculation of the correlation (Spearman by default) to cells with valid PSI values and the gene’s expression level, retaining only those ASP-expression correlation links (referred to as ASP-EXP links) with significant P values. These statistically significant links indicate potential relationships between gene expression dynamics and the usage preference of specific ASPs across the cells. When multiple scRNA-seq samples are available under any experimental conditions, we retain only ASP-EXP links that share the same correlation trend and appear at a moderately higher frequency (2 by default) to exclude batch effect-induced artifacts.
+![](/Users/shangliu/02.report/02.AEN/Figure/AEN.jpg)
+```{r echo=TRUE, eval=FALSE}
+pos <- which(colnames(exp) %in% colnames(psi_matrix))
+exp <- exp[,pos]
+multi(as.matrix(psi_matrix),as.matrix(exp),ann,outdir,parallel = T,inner_cores = 20)
+```
+
+```{r echo=TRUE, eval=FALSE}
+corm <- process_cor_results(outdir) ####### final AEN network
+saveRDS(corm,file = paste0(outdir,"step3.network.rds"))
+```
+
+```{r}
+corm <- readRDS(paste0(outdir,"step3.network.rds"))
+```
+
+### ASP & Gene Clusters
+To prioritize splicing events with broad regulatory influence, AEnet ranks ASPs or Genes based on the number of associated ASP–EXP links. The top 1,500 ASPs and Genes (by default) are selected as anchor ASPs and Genes. Using hierarchical clustering methods, we divided the ASPs into ASP clusters according to their Jaccard similarity, ensuring that ASPs in the same clusters were associated with similar gene expression sets.
+![](/Users/shangliu/02.report/02.AEN/Figure/ASP clusters.jpg)
+```{r echo=TRUE, eval=FALSE}
+corm2 <- asp_selection(corm,sample_cutoff = 2,link_cutoff = 15) ######### key ASP filter
+junc_list <- junction_clustering(corm2) ####### ASP cluster
+saveRDS(junc_list,file = paste0(outdir,"step4.asp.cluster.rds"))
+```
+
+```{r}
+junc_list <- readRDS(paste0(outdir,"step4.asp.cluster.rds"))
+ann_junc <- junc_list$asp_clusters
+head(ann_junc)
+```
+
+
+```{r echo=TRUE, eval=FALSE}
+corm2 <- gene_selection(corm,aspann,sample_cutoff = 2,link_cutoff = 30) ######### key Gene filter
+exp_list <- gene_clustering(corm2) ############ Gene Cluster
+saveRDS(exp_list,file = paste0(outdir,"step4.gene.cluster.rds"))
+```
+
+```{r}
+exp_list <- readRDS(paste0(outdir,"step4.gene.cluster.rds"))
+exp_junc <- exp_list$asp_clusters
+head(exp_junc)
+```
+
+### Cell Clustering
+To further understand the cell heterogeneity at the level of alternative splicing, we performed cell clustering analysis based on alternative splicing and gene expression. Specifically, we first calculated the enrichment scores of each ASP cluster and each gene cluster for individual cells, resulting in a cell-by-cluster enrichment score matrix. Next, the cell-ASP and Gene cluster enrichment score matrix was normalized using the scale function. Finally, the normalized matrix was used as input for the FindNeighbors and FindClusters functions of Seurat to detect cell clusters.
+Notably, cell clustering can be performed based on either cell–ASP cluster enrichment score matrix or cell–gene cluster matrix alone. Finally, cell subpopulations were delineated using a dual-modality approach that integrates alternative splicing patterns (ASPs) with gene expression data.
+![](/Users/shangliu/02.report/02.AEN/Figure/Cell clustering.jpg)
+```{r}
+clus <- sort(unique(as.character(ann$Type)))[1:19]
+pos <- which(ann$Type %in% clus)
+ann <- ann[pos,]
+
+asp_matrix <- asp_score(psi_matrix,ann_junc) ######## enrichment score for ASP
+head(asp_matrix)
+exp_matrix <- gene_score(as.matrix(exp),exp_junc) ########### enrichment score for Gene
+head(exp_matrix)
+```
+
+```{r}
+siz <- NULL
+for(i in 2:ncol(asp_matrix)){
+  tmp <- as.numeric(as.character(as.matrix(asp_matrix[,i])))
+  pos <- which(tmp %in% NaN)
+  siz <- c(siz,pos)
+}
+siz <- unique(siz)
+asp_matrix <- asp_matrix[-siz,]
+
+pos <- which(asp_matrix$Cell %in% ann$cell)
+asp_matrix <- asp_matrix[pos,]
+pos <- which(exp_matrix$Cell %in% ann$cell)
+exp_matrix <- exp_matrix[pos,]
+
+pos <- which(asp_matrix$Cell %in% exp_matrix$Cell)
+asp_matrix <- asp_matrix[pos,]
+pos <- which(exp_matrix$Cell %in% asp_matrix$Cell)
+exp_matrix <- exp_matrix[pos,]
+
+res <- cell_clus(asp_matrix,exp_matrix, resolution = 0.5,min.dist = 0.1) ########### Cell clustering
+colnames(ann)[1] <- "Cell"
+ann1 <- merge(ann,res,by = "Cell")
+ggplot(ann1,aes(x=as.numeric(umap_1),y=as.numeric(umap_2),color = Type))+geom_point()+
+  scale_color_manual(values = col) + labs(x="UMAP_1",y="UMAP_2") + theme_classic()
+ggplot(ann1,aes(x=as.numeric(umap_1),y=as.numeric(umap_2),color = cluster))+geom_point()+
+  scale_color_manual(values = col) + labs(x="UMAP_1",y="UMAP_2") + theme_classic()
+
+res1 <- res[order(res$cluster),]
+res2 <- data.frame(clus = res1$cluster)
+rownames(res2) <- res1$Cell
+
+rownames(asp_matrix) <- asp_matrix$Cell
+asp_mat <- asp_matrix[, setdiff(colnames(asp_matrix), "Cell"), drop = FALSE]
+asp_mat <- asp_mat[rownames(res2),]
+pheatmap::pheatmap(asp_mat,cluster_rows = F,cluster_cols = F,annotation_row = res2,show_rownames = F,scale = "column")
+```
+
+The ARI and NMI values represent the concordance between the clusters identified by AEnet and the ground truth as reported in the original study.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+siz <- NULL
+pin <- c(0.9,0.95,1,1.05,1.1,1.15,1.2,1.25,1.3,1.35)
+for(i in pin){
+  res <- cell_clus(asp_matrix,exp_matrix,resolution = i,scale = FALSE)
+  colnames(ann)[1] <- "Cell"
+  ann1 <- merge(ann,res,by = "Cell")
+
+  if (require("mclust")) {
+    tmp <- adjustedRandIndex(ann1$Type,ann1$cluster)
+  }
+  siz <- c(siz,tmp)
+}
+```
+
+```{r}
+siz
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+siz <- NULL
+pin <- c(0.9,0.95,1,1.05,1.1,1.15,1.2,1.25,1.3,1.35)
+for(i in pin){
+  res <- cell_clus(NULL,exp_matrix,resolution = i,scale = FALSE)
+  colnames(ann)[1] <- "Cell"
+  ann1 <- merge(ann,res,by = "Cell")
+
+  if (require("aricode")) {
+    tmp <- NMI(ann1$Type,ann1$cluster)
+  }
+  siz <- c(siz,tmp)
+}
+```
+
+```{r}
+siz
+```
+
+### The Regulatory
+To identify key splicing factors, AEnet integrated the AEN network with a predefined list of splicing factors and a specific set of ASP events. This allowed us to construct a sub-network of ASP-splicing factors, facilitating the exploration of the regulatory relationships between alternative splicing events and splicing factors. The higher the degree strength of the splicing factor, the more it indicated a close relationship with the occurrence of these ASP events. The regulatory direction of splicing factors on the given set of ASPs was determined based on the proportion of positive or negative correlations. Specifically, if 75% or more of the splicing factor–ASP pairs were positive (or negative), the splicing factor was classified as positively (or negatively) regulating the ASP sets.
+AEnet also identified key pathways associated with different ASP patterns. For each ASP event, gene sets that were positively and negatively correlated with the event were identified based on the AEN network. Functional enrichment analysis was then performed on both the ASP’s gene and the positively (or negatively) correlated gene sets. The pathway to which the ASP gene belongs is considered the most likely pathway affected by the ASP change.
+
+![](/Users/shangliu/02.report/02.AEN/Figure/Regulartory.jpg)
+
+```{r}
+sfname <- sf$V1
+geneinfo <- read.table(paste0(indir,"/Gene.info"),sep = "\t",header = T)
+
+pos <- which(geneinfo$symbol %in% sfname)
+sfid <- geneinfo$geneID[pos]
+
+sf <- key_sf(corm,as.character(sfid),ann_junc,cluster = "C_3")
+
+sf1 <- sf[1:10,]
+colnames(sf1)[1] <- c("geneID")
+sf2 <- merge(sf1,geneinfo,by = "geneID")
+sf2 <- sf2[order(-sf2$importance),]
+sf2$symbol <- factor(sf2$symbol,levels = as.character(sf2$symbol))
+
+ggplot(sf2,aes(x=symbol,y=importance))+geom_bar(stat = "identity")+theme_classic()
+```
+
