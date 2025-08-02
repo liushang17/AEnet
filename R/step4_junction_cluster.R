@@ -483,7 +483,7 @@ gene_clustering <- function(corm2, cluster_num = 25, asp_num = 10) {
   
   
   sui <- data.frame(table(rowinfo1$pattern))
-  pos <- which(sui$Freq >= 10)
+  pos <- which(sui$Freq >= asp_num)
   sui2 <- sui[pos,]
   
   rowinfo$PC <- "Other"
