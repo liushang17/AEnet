@@ -4,20 +4,20 @@ Alternative splicing (AS), as a crutical promoter of proteomic diversity, consti
 ## The principle of AEnet
 AEnet is a computational method designed to uncover cellular alternative splicing (AS) heterogeneity and regulatory mechanisms by integrating splicing patterns with gene expression in single-cell RNA-seq (scRNA-seq) data. It operates in three major phases:
 
-Quantification of Alternative Splicing Patterns (ASPs):
+**Quantification of Alternative Splicing Patterns (ASPs)**:
 AEnet computes the percent spliced-in (PSI) values of ASPs using junction reads. PSI is calculated per cell, with missing values (NaNs) arising from undetected junctions due to data sparsity. To address the high dropout rates in scRNA-seq, AEnet focuses only on cells with valid PSI and expression values when analyzing ASP–gene expression (ASP-EXP) relationships.
 
-Construction of ASP–Expression Links:
+**Construction of ASP–Expression Links**:
 Spearman correlations between ASPs and gene expression levels are computed across valid cells. Only statistically significant and reproducible ASP-EXP links are retained—especially those consistent across multiple samples, thereby minimizing batch effects. These links reflect potential regulatory relationships, such as splicing factor-driven AS regulation or splicing-associated expression dynamics.
 
-Clustering and Functional Interpretation:
+**Clustering and Functional Interpretation**:
 AEnet ranks ASPs based on the number of significant ASP-EXP links and selects top-ranking ASPs as "anchors." Using Jaccard similarity between their associated gene sets, AEnet clusters ASPs and associated genes into splicing modules and co-expression programs. These clusters enable the identification of:
 
-Cell subpopulations with distinct splicing profiles,
+**Cell subpopulations with distinct splicing profiles**,
 
-Key splicing factors influencing ASP usage,
+**Key splicing factors influencing ASP usage**,
 
-Biological pathways modulated by specific ASPs.
+**Biological pathways modulated by specific ASPs**.
 
 In summary, AEnet systematically links AS variation with gene expression at single-cell resolution to detect splicing-driven cell states and regulatory mechanisms, providing insights into transcriptomic complexity beyond conventional expression-based clustering.
 
