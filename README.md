@@ -28,6 +28,13 @@ AEnet comprises six analytical steps: (1) Alternative Splicing Pattern (ASP) Det
 ![](https://github.com/liushang17/AEnet/blob/version1.1/All.jpg)
 
 ## The output of AEnet
+The output of AEnet focuses on evaluating three main biological events: 
+
+first, the separation of cell subpopulations with distinct ASP compositions; 
+
+second, the key splicing factors that influence specific ASP clusters (analogous to gene markers), identified based on a predefined list of splicing factors; 
+
+third, the functional pathways activated or inhibited by individual or small subsets of ASPs. 
 
 
 ## The demo datasets
