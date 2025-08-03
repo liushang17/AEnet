@@ -25,7 +25,7 @@ In summary, AEnet systematically links AS variation with gene expression at sing
 
 ## The steps for AEnet
 AEnet comprises six analytical steps: (1) Alternative Splicing Pattern (ASP) Determination, (2) ASP–Gene Expression Network Construction, (3) Multi-Sample Integration, (4) Key ASP/Gene Identification, (5) ASP/Gene Cluster Inference, and (6) Cell Type Annotation Assistance and Regulatory Mechanism Prediction.
-![](https://github.com/liushang17/AEnet/blob/version1.1/All.png)
+![](https://github.com/liushang17/AEnet/blob/version1.1/All.jpg)
 
 ## The output of AEnet
 
