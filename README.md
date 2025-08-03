@@ -36,7 +36,7 @@ second, the key splicing factors that influence specific ASP clusters (analogous
 
 third, the functional pathways activated or inhibited by individual or small subsets of ASPs. 
 
-
+![](https://github.com/liushang17/AEnet/blob/version1.1/result.jpg)
 ## The demo datasets
 The demonstration datasets can be downloaded from the following links:
 
