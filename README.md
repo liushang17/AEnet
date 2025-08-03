@@ -3,11 +3,18 @@ Alternative splicing (AS), as a crutical promoter of proteomic diversity, consti
 
 ## The steps for AEnet
 AEnet comprises six analytical steps: (1) Alternative Splicing Pattern (ASP) Determination, (2) ASP–Gene Expression Network Construction, (3) Multi-Sample Integration, (4) Key ASP/Gene Identification, (5) ASP/Gene Cluster Inference, and (6) Cell Type Annotation Assistance and Regulatory Mechanism Prediction.
-Two demonstration datasets are provided—T cell and iPSC datasets—with corresponding example scripts named demo.Tcells.R and demo.iPSC.R. The demo datasets can be downloaded from the following links: (https://drive.google.com/file/d/1Qkg4De3DER4Qs5V_vP-M7GgwprwjwkLA/view?usp=drive_link and https://drive.google.com/file/d/1zuut5OlYgFeYXytU5kUZsYKbx07CKb56/view?usp=drive_link).
 ![Scheme of AEnet methods.](https://github.com/liushang17/AEnet/blob/version1.1/image.png)
 
 ## The demo datasets
-For the dataset with single samples: 
+The demonstration datasets can be downloaded from the following links:
+iPSC dataset: https://drive.google.com/file/d/1Qkg4De3DER4Qs5V_vP-M7GgwprwjwkLA/view?usp=drive_link
+T cell dataset: https://drive.google.com/file/d/1zuut5OlYgFeYXytU5kUZsYKbx07CKb56/view?usp=drive_link
+
+For browser-based visualization of the analysis results:
+Single-sample dataset (iPSC): https://liushang17.github.io/ipsc.html
+Multi-sample dataset (T cells): https://liushang17.github.io/tcells.html
+
+Two example R scripts, demo.iPSC.R and demo.Tcells.R, are provided to demonstrate the usage of AEnet with the iPSC and T cell datasets, respectively. 
 
 ## install
 devtools::install_github("https://github.com/liushang17/AEnet")
