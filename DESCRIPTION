@@ -15,6 +15,6 @@ Depends: Rfast, dplyr, pheatmap, reshape2, tidyr, data.table, Matrix,
         openxlsx, parallel
 NeedsCompilation: no
 Packaged: 2024-07-30 13:01:33 UTC; shangliu
-Author: Shang Liu [aut, cre] (<https://orcid.org/0000-0001-8050-7968>)
-Maintainer: Shang Liu <liushang@genomics.cn>
+Author: Shang Liu [aut, cre] (<https://orcid.org/0000-0001-8050-7968>) Liang Wu [aut] (<https://orcid.org/0000-0001-6259-261X>)
+Maintainer: Shang Liu <liushang@genomics.cn> Wending Pang <dpang@163.com>
 
