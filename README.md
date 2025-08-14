@@ -57,5 +57,6 @@ devtools::install_github("https://github.com/liushang17/AEnet")
 
 ## Maintainers
   liushang@genomics.cn
+  
   wdpang@163.com
 
